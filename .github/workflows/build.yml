@@ -20,7 +20,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       matrix:
         java: [11, 17]
@@ -44,7 +44,7 @@ jobs:
         run: mvn -B formatter:validate impsort:check javadoc:javadoc install --file pom.xml
 
   wildfly-tests:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       matrix:
         java: [17]
@@ -81,7 +81,7 @@ jobs:
           mvn install -Dversion.io.smallrye.graphql=$SMALLRYE_VERSION --file wildfly-graphql-feature-pack/pom.xml
 
   quarkus-tests:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       matrix:
         java: [17]

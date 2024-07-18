@@ -125,7 +125,8 @@ public class TypeInfo {
         ParameterizedType paramType = genericInterfaces.stream()
                 .filter(i -> i.getRawType().equals(typeVariable.getGenericDeclaration()))
                 .findFirst()
-                .orElseThrow(() -> new UnsupportedOperationException("can't resolve type variable of a " + actualTypeArgument.getTypeName()));
+                .orElseThrow(() -> new UnsupportedOperationException(
+                        "can't resolve type variable of a " + actualTypeArgument.getTypeName()));
         var typeParameters = List.of(((Class<?>) paramType.getRawType()).getTypeParameters());
         var actual = typeParameters.stream().filter(p -> p.getName().equals(typeVariable.getName())).findFirst().orElseThrow();
         int index = typeParameters.indexOf(actual);

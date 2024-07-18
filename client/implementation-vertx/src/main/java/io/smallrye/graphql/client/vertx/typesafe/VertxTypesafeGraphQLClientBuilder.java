@@ -1,6 +1,5 @@
 package io.smallrye.graphql.client.vertx.typesafe;
 
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.net.URI;
 import java.security.AccessController;

@@ -103,6 +103,9 @@ public class TypeInfo {
 
     private Class<?> resolveTypeVariable() {
         // TODO this is not generally correct
+        if(!(container.type instanceof ParameterizedType)) {
+            return resolveGenericParameter(container.type, type);
+        }
         ParameterizedType parameterizedType = (ParameterizedType) container.type;
         Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
         Type actualTypeArgument = actualTypeArguments[0];
@@ -111,15 +114,15 @@ public class TypeInfo {
         } else if (actualTypeArgument instanceof ParameterizedType) {
             return Object.class;
         } else if (actualTypeArgument instanceof TypeVariable) {
-            return resolveGenericParameter(actualTypeArgument);
+            return resolveGenericParameter(container.container.type, actualTypeArgument);
         } else {
             throw new UnsupportedOperationException("can't resolve type variable of a " + actualTypeArgument.getTypeName());
         }
     }
 
-    private Class<?> resolveGenericParameter(Type actualTypeArgument) {
+    private Class<?> resolveGenericParameter(Type container, Type actualTypeArgument) {
         TypeVariable<?> typeVariable = (TypeVariable<?>) actualTypeArgument;
-        Set<ParameterizedType> genericInterfaces = Arrays.stream(((Class<?>) container.container.type).getGenericInterfaces())
+        Set<ParameterizedType> genericInterfaces = Arrays.stream(((Class<?>) container).getGenericInterfaces())
                 .map(ParameterizedType.class::cast)
                 .collect(Collectors.toSet());
         ParameterizedType paramType = genericInterfaces.stream()

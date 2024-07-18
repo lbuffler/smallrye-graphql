@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'main'
+      - 'support-generic-parent-interface-api'
     paths-ignore:
       - '.gitignore'
       - 'CODEOWNERS'

@@ -21,12 +21,15 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.Stream.Builder;
 
@@ -107,9 +110,26 @@ public class TypeInfo {
             return (Class<?>) actualTypeArgument;
         } else if (actualTypeArgument instanceof ParameterizedType) {
             return Object.class;
+        } else if (actualTypeArgument instanceof TypeVariable) {
+            return resolveGenericParameter(actualTypeArgument);
         } else {
             throw new UnsupportedOperationException("can't resolve type variable of a " + actualTypeArgument.getTypeName());
         }
+    }
+
+    private Class<?> resolveGenericParameter(Type actualTypeArgument) {
+        TypeVariable<?> typeVariable = (TypeVariable<?>) actualTypeArgument;
+        Set<ParameterizedType> genericInterfaces = Arrays.stream(((Class<?>) container.container.type).getGenericInterfaces())
+                .map(ParameterizedType.class::cast)
+                .collect(Collectors.toSet());
+        ParameterizedType paramType = genericInterfaces.stream()
+                .filter(i -> i.getRawType().equals(typeVariable.getGenericDeclaration()))
+                .findFirst()
+                .orElseThrow(() -> new UnsupportedOperationException("can't resolve type variable of a " + actualTypeArgument.getTypeName()));
+        var typeParameters = List.of(((Class<?>) paramType.getRawType()).getTypeParameters());
+        var actual = typeParameters.stream().filter(p -> p.getName().equals(typeVariable.getName())).findFirst().orElseThrow();
+        int index = typeParameters.indexOf(actual);
+        return (Class<?>) paramType.getActualTypeArguments()[index];
     }
 
     public String getPackage() {
